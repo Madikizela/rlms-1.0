@@ -1,0 +1,1 @@
+# .NET Core\nbin/\nobj/\n\n# Node.js\nnode_modules/\n.env\n\n# Build results\n[Dd]ebug/\n[Rr]elease/\n[Bb]uild/\n\n# Visual Studio files\n.vs/\n*.user\n*.suo\n\n# React build\nfrontend/build/\nfrontend/dist/\n\n# IDE files\n.idea/\n.vscode/\n\n# Logs\n*.log\nlogs/\n\n# Local configuration\nappsettings.Development.json\n
