@@ -1,0 +1,395 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ClientForm from './ClientForm';
+import PersonalInfoForm from './PersonalInfoForm';
+
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: number;
+}
+
+const Dashboard = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [activeSection, setActiveSection] = useState('clients');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get user data from localStorage or token
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      setUser(JSON.parse(userData));
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  const menuItems = [
+    { id: 'clients', label: 'Client Management', icon: '🏢' },
+    { id: 'profile', label: 'Profile', icon: '👤' },
+  ];
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'clients':
+        return (
+          <div className="container-fluid">
+            <div className="card text-white mb-4 border-0 shadow-lg" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', backdropFilter: 'blur(10px)'}}>
+              <div className="card-body p-4">
+                <h2 className="card-title h3 mb-2">Client Management 🏢</h2>
+                <p className="card-text opacity-90">Manage your clients and their information</p>
+              </div>
+            </div>
+            
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h3 className="h4 mb-0 text-white">Client Operations</h3>
+              <button 
+                onClick={() => setActiveSection('add-client')}
+                className="btn btn-success d-flex align-items-center shadow-lg"
+                style={{background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)', border: 'none', transform: 'translateY(0)', transition: 'all 0.3s ease'}}
+                onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              >
+                <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
+                </svg>
+                Add New Client
+              </button>
+            </div>
+            
+            <div className="row g-4">
+              <div className="col-md-6">
+                <div className="card h-100 shadow-lg border-0" style={{background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.2)'}}>
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h4 className="card-title h5 text-white">View All Clients</h4>
+                      <div className="p-3 rounded-circle" style={{background: 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)'}}>
+                        <svg width="24" height="24" fill="white" viewBox="0 0 20 20">
+                          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <p className="card-text text-white opacity-75 mb-3">Browse and manage all registered clients in the system.</p>
+                    <button 
+                      onClick={() => setActiveSection('view-clients')}
+                      className="btn btn-primary w-100 shadow"
+                      style={{background: 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)', border: 'none'}}
+                    >
+                      View Client List
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="col-md-6">
+                <div className="card h-100 shadow-lg border-0" style={{background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.2)'}}>
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h4 className="card-title h5 text-white">Client Statistics</h4>
+                      <div className="p-3 rounded-circle" style={{background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)'}}>
+                        <svg width="24" height="24" fill="white" viewBox="0 0 20 20">
+                          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="d-flex flex-column gap-3">
+                      <div className="d-flex justify-content-between align-items-center p-2 rounded" style={{background: 'rgba(255, 255, 255, 0.1)'}}>
+                        <span className="text-white opacity-75">Total Clients:</span>
+                        <span className="fw-bold text-white fs-5">24</span>
+                      </div>
+                      <div className="d-flex justify-content-between align-items-center p-2 rounded" style={{background: 'rgba(40, 167, 69, 0.2)'}}>
+                        <span className="text-white opacity-75">Active Clients:</span>
+                        <span className="fw-bold text-success fs-5">22</span>
+                      </div>
+                      <div className="d-flex justify-content-between align-items-center p-2 rounded" style={{background: 'rgba(0, 123, 255, 0.2)'}}>
+                        <span className="text-white opacity-75">New This Month:</span>
+                        <span className="fw-bold text-primary fs-5">3</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'add-client':
+        return (
+          <div className="container-fluid">
+            <div className="card bg-success text-white mb-4">
+              <div className="card-body p-4">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h2 className="card-title h3 mb-2">Add New Client ➕</h2>
+                    <p className="card-text">Register a new client in the system</p>
+                  </div>
+                  <button 
+                    onClick={() => setActiveSection('clients')}
+                    className="btn btn-light btn-sm d-flex align-items-center"
+                  >
+                    <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd"/>
+                    </svg>
+                    Back to Clients
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <ClientForm
+              onCancel={() => setActiveSection('clients')}
+              onSubmit={async (data) => {
+                try {
+                  // Here you would typically make an API call to save the client
+                  console.log('Client data:', data);
+                  // For now, just show success and go back to clients
+                  alert('Client added successfully!');
+                  setActiveSection('clients');
+                } catch (error) {
+                  console.error('Error adding client:', error);
+                  alert('Error adding client. Please try again.');
+                }
+              }}
+            />
+          </div>
+        );
+      case 'view-clients':
+        return (
+          <div className="container-fluid">
+            <div className="card bg-primary text-white mb-4">
+              <div className="card-body p-4">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h2 className="card-title h3 mb-2">Client Directory 📋</h2>
+                    <p className="card-text">View and manage all registered clients</p>
+                  </div>
+                  <button 
+                    onClick={() => setActiveSection('clients')}
+                    className="btn btn-light btn-sm d-flex align-items-center"
+                  >
+                    <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd"/>
+                    </svg>
+                    Back to Clients
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="card shadow-sm">
+              <div className="card-header bg-light">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h3 className="card-title h5 mb-0">All Clients</h3>
+                  <div className="d-flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Search clients..."
+                      className="form-control form-control-sm"
+                      style={{ width: '200px' }}
+                    />
+                    <button className="btn btn-primary btn-sm">
+                      Search
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="table-responsive">
+                <table className="table table-hover mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th scope="col">Client Name</th>
+                      <th scope="col">Contact Person</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Phone</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Sample client data */}
+                    {[
+                      { id: 1, name: 'Tech Solutions Inc.', contact: 'John Smith', email: 'john@techsolutions.com', phone: '+1 234-567-8900', status: 'Active' },
+                      { id: 2, name: 'Global Enterprises', contact: 'Sarah Johnson', email: 'sarah@globalent.com', phone: '+1 234-567-8901', status: 'Active' },
+                      { id: 3, name: 'Innovation Corp', contact: 'Mike Davis', email: 'mike@innovation.com', phone: '+1 234-567-8902', status: 'Inactive' },
+                      { id: 4, name: 'Future Systems', contact: 'Lisa Wilson', email: 'lisa@futuresys.com', phone: '+1 234-567-8903', status: 'Active' },
+                    ].map((client) => (
+                      <tr key={client.id}>
+                        <td>
+                          <div className="fw-medium">{client.name}</div>
+                        </td>
+                        <td className="text-muted">{client.contact}</td>
+                        <td className="text-muted">{client.email}</td>
+                        <td className="text-muted">{client.phone}</td>
+                        <td>
+                          <span className={`badge ${
+                            client.status === 'Active' 
+                              ? 'bg-success' 
+                              : 'bg-danger'
+                          }`}>
+                            {client.status}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <button className="btn btn-outline-primary btn-sm">Edit</button>
+                            <button className="btn btn-outline-danger btn-sm">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="card-footer bg-light">
+                <div className="d-flex justify-content-between align-items-center">
+                  <p className="text-muted mb-0">
+                    Showing <span className="fw-medium">1</span> to <span className="fw-medium">4</span> of{' '}
+                    <span className="fw-medium">4</span> results
+                  </p>
+                  <nav aria-label="Client pagination">
+                    <ul className="pagination pagination-sm mb-0">
+                      <li className="page-item disabled">
+                        <a className="page-link" href="#" tabIndex={-1} aria-disabled="true">Previous</a>
+                      </li>
+                      <li className="page-item active">
+                        <a className="page-link" href="#">1</a>
+                      </li>
+                      <li className="page-item disabled">
+                        <a className="page-link" href="#">Next</a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'profile':
+        return (
+          <PersonalInfoForm 
+            initialData={{
+              firstName: user?.firstName || '',
+              lastName: user?.lastName || '',
+              email: user?.email || ''
+            }}
+            onSubmit={async (formData) => {
+              // Here you would typically send the data to your backend
+              console.log('Saving profile data:', formData);
+              alert('Profile updated successfully!');
+            }}
+          />
+        );
+      default:
+        return <div>Section not found</div>;
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-vh-100 w-100 d-flex flex-column" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+      {/* Bootstrap Navigation */}
+      <nav className="navbar navbar-expand-lg navbar-dark shadow-lg flex-shrink-0" style={{background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(255, 255, 255, 0.2)'}}>
+        <div className="container-fluid">
+          <div className="navbar-brand d-flex align-items-center">
+            <img 
+              src="/src/assets/logo.png" 
+              alt="RLMS Logo" 
+              width="40" 
+              height="40" 
+              className="me-3"
+              style={{objectFit: 'contain'}}
+            />
+            <h1 className="h3 mb-0 fw-bold text-white">
+              RLMS
+            </h1>
+          </div>
+          <div className="d-flex align-items-center">
+            <div className="dropdown me-3">
+              <button className="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" style={{background: 'rgba(255, 255, 255, 0.2)', border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white'}}>
+                <div className="bg-white rounded-circle d-flex align-items-center justify-content-center me-2" style={{width: '32px', height: '32px'}}>
+                  <span className="text-primary small fw-bold">
+                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                  </span>
+                </div>
+                {user?.firstName} {user?.lastName}
+              </button>
+              <ul className="dropdown-menu">
+                <li><a className="dropdown-item" href="#" onClick={() => setActiveSection('profile')}>Profile</a></li>
+                <li><hr className="dropdown-divider" /></li>
+                <li><a className="dropdown-item text-danger" href="#" onClick={handleLogout}>Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="container-fluid flex-grow-1 d-flex p-0" style={{minHeight: 'calc(100vh - 76px)'}}>
+        <div className="row w-100 g-0 flex-grow-1">
+          {/* Bootstrap Sidebar */}
+          <div className="col-md-3 col-lg-2 d-flex">
+            <div className="shadow-lg w-100" style={{background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', borderRight: '1px solid rgba(255, 255, 255, 0.2)'}}>
+              <div className="p-3">
+                <nav className="nav flex-column">
+                  {menuItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveSection(item.id)}
+                      className={`nav-link btn text-start border-0 rounded-3 mb-3 d-flex align-items-center transition-all ${
+                        activeSection === item.id
+                          ? 'btn-primary'
+                          : 'text-white'
+                      }`}
+                      style={activeSection === item.id 
+                        ? { backgroundColor: '#0d6efd', color: 'white', transform: 'translateX(5px)', boxShadow: '0 4px 15px rgba(13, 110, 253, 0.4)' } 
+                        : { background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }
+                      }
+                    >
+                      <span className="me-3 fs-5">{item.icon}</span>
+                      <span className="fw-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          </div>
+
+          {/* Bootstrap Main Content */}
+          <div className="col-md-9 col-lg-10 d-flex">
+            <div className="p-4 w-100" style={{background: 'rgba(255, 255, 255, 0.05)', borderRadius: '20px', margin: '20px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.1)', maxHeight: 'calc(100vh - 116px)', overflowY: 'auto'}}>
+              {renderContent()}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
